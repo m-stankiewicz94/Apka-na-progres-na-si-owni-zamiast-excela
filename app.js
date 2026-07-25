@@ -622,41 +622,82 @@ function runListHTML() {
 }
 
 /* ---------- Pomiary ---------- */
+/* Wspólna konfiguracja metryk ciała: formularz, delty, wykresy, lista, CSV.
+   Klucze weight/waist muszą zostać — starsze wpisy używają tych nazw. */
+const BODY_METRICS = [
+  { key: 'weight', label: 'Waga', unit: 'kg', ph: 'np. 82,4', color: '#3b82f6' },
+  { key: 'waist', label: 'Pas', unit: 'cm', ph: 'np. 86,5', color: '#f97316' },
+  { key: 'chest', label: 'Klatka', unit: 'cm', ph: 'np. 102', color: '#22c55e' },
+  { key: 'biceps', label: 'Biceps', unit: 'cm', ph: 'np. 38,5', color: '#a78bfa' },
+  { key: 'hips', label: 'Biodra', unit: 'cm', ph: 'np. 98', color: '#f472b6' },
+  { key: 'thigh', label: 'Udo', unit: 'cm', ph: 'np. 60', color: '#fbbf24' },
+  { key: 'calf', label: 'Łydka', unit: 'cm', ph: 'np. 38', color: '#7dd3fc' }
+];
+
 function renderMeasure() {
   resetView();
   let html = '<h2>Pomiary</h2><div class="card">' +
     '<label class="field"><span>Data</span><input id="mdate" type="date" value="' + todayISO() + '"></label>' +
-    '<div class="grid2">' +
-    '<label class="field"><span>Waga (kg)</span><input id="mw" type="text" inputmode="decimal" placeholder="np. 82,4"></label>' +
-    '<label class="field"><span>Pas (cm)</span><input id="mp" type="text" inputmode="decimal" placeholder="np. 86,5"></label>' +
-    '</div>' +
+    '<div class="grid2">';
+  BODY_METRICS.forEach(function (m) {
+    html += '<label class="field"><span>' + m.label + ' (' + m.unit + ')</span>' +
+      '<input id="m_' + m.key + '" type="text" inputmode="decimal" autocomplete="off" placeholder="' + m.ph + '"></label>';
+  });
+  html += '</div>' +
+    '<p class="mut small">Wypełnij tylko to, co dziś mierzysz — reszta może zostać pusta.</p>' +
     '<button type="button" id="msave" class="btn primary">Zapisz pomiar</button>' +
     '</div>';
 
   const sorted = measures.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
   if (sorted.length >= 2) {
     const last = sorted[sorted.length - 1], prev = sorted[sorted.length - 2];
-    html += '<div class="delta">Zmiana od poprzedniego pomiaru (' + fmtDate(prev.date) + ' → ' + fmtDate(last.date) + '): ' +
-      deltaTxt('Waga', last.weight, prev.weight, 'kg') + ' · ' + deltaTxt('Pas', last.waist, prev.waist, 'cm') + '</div>';
+    const parts = [];
+    BODY_METRICS.forEach(function (m) {
+      if (last[m.key] != null && prev[m.key] != null) parts.push(deltaTxt(m.label, last[m.key], prev[m.key], m.unit));
+    });
+    if (parts.length) {
+      html += '<div class="delta">Zmiana od poprzedniego pomiaru (' + fmtDate(prev.date) + ' → ' + fmtDate(last.date) + '): ' +
+        parts.join(' · ') + '</div>';
+    }
   }
-  const wPts = sorted.filter(function (m) { return m.weight != null; }).map(function (m) { return { x: +parseISO(m.date), y: m.weight }; });
-  const pPts = sorted.filter(function (m) { return m.waist != null; }).map(function (m) { return { x: +parseISO(m.date), y: m.waist }; });
-  html += '<p class="charttitle">Waga (kg)</p><div class="chartbox">' + svgChart([{ points: wPts, color: '#3b82f6' }]) + '</div>';
-  html += '<p class="charttitle">Pas (cm)</p><div class="chartbox">' + svgChart([{ points: pPts, color: '#f97316' }]) + '</div>';
+  let anyChart = false;
+  BODY_METRICS.forEach(function (m) {
+    const pts = sorted.filter(function (e) { return e[m.key] != null; })
+      .map(function (e) { return { x: +parseISO(e.date), y: e[m.key] }; });
+    if (pts.length >= 2) {
+      anyChart = true;
+      html += '<p class="charttitle">' + m.label + ' (' + m.unit + ')</p><div class="chartbox">' +
+        svgChart([{ points: pts, color: m.color }]) + '</div>';
+    }
+  });
+  if (!anyChart && sorted.length) {
+    html += '<p class="mut small">Wykres danej wartości pojawi się, gdy zapiszesz ją co najmniej dwa razy.</p>';
+  }
 
-  html += '<h2>Historia pomiarów</h2><ul class="list">' + (sorted.length ? sorted.slice().reverse().map(function (m) {
-    return '<li><div class="li-main"><div>' + (m.weight != null ? fmtNum(m.weight) + ' kg' : '—') + ' · pas ' + (m.waist != null ? fmtNum(m.waist) + ' cm' : '—') + '</div>' +
-      '<div class="li-date">' + fmtDate(m.date) + '</div></div>' +
-      '<button type="button" class="del" data-m="' + m.id + '" aria-label="Usuń pomiar">✕</button></li>';
+  html += '<h2>Historia pomiarów</h2><ul class="list">' + (sorted.length ? sorted.slice().reverse().map(function (e) {
+    const parts = [];
+    BODY_METRICS.forEach(function (m) {
+      if (e[m.key] != null) {
+        parts.push(m.key === 'weight' ? fmtNum(e[m.key]) + ' kg' : m.label.toLowerCase() + ' ' + fmtNum(e[m.key]));
+      }
+    });
+    return '<li><div class="li-main"><div>' + (parts.length ? parts.join(' · ') : '—') + '</div>' +
+      '<div class="li-date">' + fmtDate(e.date) + '</div></div>' +
+      '<button type="button" class="del" data-m="' + e.id + '" aria-label="Usuń pomiar">✕</button></li>';
   }).join('') : '<li><span class="mut">Brak pomiarów.</span></li>') + '</ul>';
   view.innerHTML = html;
 
   view.addEventListener('click', function (e) {
     if (e.target.id === 'msave') {
-      const w = parseNum(document.getElementById('mw').value);
-      const p = parseNum(document.getElementById('mp').value);
-      if (w == null && p == null) { toast('Podaj wagę lub obwód pasa'); return; }
-      measures.push({ id: uid(), date: document.getElementById('mdate').value || todayISO(), weight: w, waist: p });
+      const entry = { id: uid(), date: document.getElementById('mdate').value || todayISO() };
+      let any = false;
+      BODY_METRICS.forEach(function (m) {
+        const v = parseNum(document.getElementById('m_' + m.key).value);
+        entry[m.key] = v;
+        if (v != null) any = true;
+      });
+      if (!any) { toast('Podaj przynajmniej jedną wartość'); return; }
+      measures.push(entry);
       saveKey('measures', measures);
       toast('Pomiar zapisany ✓');
       renderMeasure();
@@ -860,9 +901,9 @@ function exportCSVRuns() {
   download('biegi-' + stamp() + '.csv', csvText(rows), 'text/csv;charset=utf-8');
 }
 function exportCSVMeasures() {
-  const rows = [['Data', 'Waga (kg)', 'Pas (cm)']];
-  measures.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; }).forEach(function (m) {
-    rows.push([m.date, fmtNum(m.weight), fmtNum(m.waist)]);
+  const rows = [['Data'].concat(BODY_METRICS.map(function (m) { return m.label + ' (' + m.unit + ')'; }))];
+  measures.slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; }).forEach(function (e) {
+    rows.push([e.date].concat(BODY_METRICS.map(function (m) { return fmtNum(e[m.key]); })));
   });
   download('pomiary-' + stamp() + '.csv', csvText(rows), 'text/csv;charset=utf-8');
 }

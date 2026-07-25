@@ -15,7 +15,8 @@ bez frameworków — czysty HTML + CSS + JS.
 - Cykl 8-tygodniowy z deloadem w tygodniu 8 (połowa serii, −30% ciężaru)
 - Timer przerwy po odhaczeniu serii (wyłączany w ustawieniach)
 - Autozapis szkicu treningu — nic nie ginie po zablokowaniu ekranu
-- Bieganie (czas, dystans, tętno, samopoczucie, tempo min/km) i pomiary (waga, pas) z wykresami SVG
+- Bieganie (czas, dystans, tętno, samopoczucie, tempo min/km) i pomiary ciała
+  (waga, pas, klatka, biceps, biodra, udo, łydka) z wykresami SVG
 - Historia każdego ćwiczenia z mini-wykresem progresu
 - Eksport/import kopii JSON, eksport CSV (średniki, UTF-8 z BOM — otwiera się w polskim Excelu)
 
