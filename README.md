@@ -19,6 +19,7 @@ bez frameworków — czysty HTML + CSS + JS.
   (waga, pas, klatka, biceps, biodra, udo, łydka) z wykresami SVG
 - Historia każdego ćwiczenia z mini-wykresem progresu
 - Eksport/import kopii JSON, eksport CSV (średniki, UTF-8 z BOM — otwiera się w polskim Excelu)
+- Zakładka „Instrukcja" — zasady progresji (RIR 1–2), deload, plan tygodnia i szybki zapis treningu
 
 ## Pliki
 

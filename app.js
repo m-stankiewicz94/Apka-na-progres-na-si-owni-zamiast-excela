@@ -770,6 +770,69 @@ function accentFor(exId) {
   return p === 'A' ? '#3b82f6' : p === 'B' ? '#22c55e' : '#f97316';
 }
 
+/* ---------- Instrukcja ---------- */
+function renderGuide() {
+  resetView();
+  const wk = cycleWeek();
+  let html = '<div class="guide">';
+  html += '<h2>Instrukcja</h2>';
+  html += '<p class="lead">Twój plan i zasady progresji z Excela — w skrócie, zawsze pod ręką. ' +
+    'Jesteś w <span class="k">tygodniu ' + wk + '/8</span>' + (wk === 8 ? ' (deload)' : '') + '.</p>';
+
+  html += '<div class="card"><h3>🎯 Jak działa progresja (RIR 1–2)</h3>' +
+    '<p>Każdą serię wykonuj z zapasem <span class="k">1–2 powtórzeń</span> (RIR 1–2) — kończ ją, gdy w baku zostają jeszcze 1–2 czyste powtórzenia, nie do upadku.</p>' +
+    '<p>Gdy w danym ćwiczeniu osiągniesz <span class="k">górną granicę zakresu we wszystkich seriach</span>, następnym razem dołóż ciężar:</p>' +
+    '<ul>' +
+    '<li><span class="hl">+2,5 kg</span> — góra ciała (klatka, plecy, barki, ramiona, brzuch)</li>' +
+    '<li><span class="hl legs">+5 kg</span> — nogi: suwnica, uginanie nóg, przysiad bułgarski, wspięcia na palce</li>' +
+    '</ul>' +
+    '<p class="mut small">Aplikacja sama policzy to za Ciebie — na ekranie treningu zobaczysz zieloną plakietkę „Progresja: +X kg", gdy warunek jest spełniony.</p></div>';
+
+  html += '<div class="card"><h3>🔄 Cykl 8 tygodni i deload</h3>' +
+    '<p>Cykl liczony jest od <span class="k">pierwszego zapisanego treningu</span>. Tydzień <span class="k">8 to deload</span> — lżejszy tydzień na regenerację:</p>' +
+    '<ul><li><span class="k">połowa serii</span> w każdym ćwiczeniu</li><li>ciężar <span class="k">−30%</span></li></ul>' +
+    '<p class="mut small">W tygodniu 8 aplikacja pokaże pomarańczowy baner i podpowie orientacyjny ciężar deloadu. Nowy cykl (powrót do tygodnia 1) uruchomisz w zakładce „Więcej → Reset cyklu".</p></div>';
+
+  html += '<div class="card"><h3>🗓️ Plan tygodnia</h3>' +
+    '<p><span class="k">3 treningi siłowe</span> rotacyjnie:</p>' +
+    '<ul>' +
+    '<li><h3 style="margin:4px 0"><span class="tag pa">A</span> Klatka + plecy I<span class="day">poniedziałek</span></h3></li>' +
+    '<li><h3 style="margin:4px 0"><span class="tag pb">B</span> Nogi + barki<span class="day">czwartek</span></h3></li>' +
+    '<li><h3 style="margin:4px 0"><span class="tag pc">C</span> Klatka + plecy II<span class="day">sobota</span></h3></li>' +
+    '</ul>' +
+    '<p>Do tego, w wolne dni:</p>' +
+    '<ul>' +
+    '<li><span class="k">Bieganie 2× w tygodniu</span> — 30–40 min, tempo konwersacyjne (takie, przy którym dasz radę rozmawiać)</li>' +
+    '<li><span class="k">Pomiary 1× w tygodniu</span> — waga i pas (możesz też dopisać obwody: klatka, biceps, biodra, udo, łydka)</li>' +
+    '</ul></div>';
+
+  html += '<div class="card"><h3>⚡ Jak błyskawicznie zapisać trening</h3>' +
+    '<ol>' +
+    '<li>Wejdź w kafel <span class="k">A</span>, <span class="k">B</span> lub <span class="k">C</span> na ekranie startowym.</li>' +
+    '<li>Wpisz <span class="k">ciężar</span> — albo dostrój przyciskami <span class="k">− / +</span> co 2,5 kg.</li>' +
+    '<li>Po wykonanej serii <span class="k">odhacz ptaszek</span> — startuje timer przerwy (możesz go wyłączyć w „Więcej").</li>' +
+    '<li>Wpisz liczbę <span class="k">powtórzeń</span> w każdej serii.</li>' +
+    '<li>Przycisk <span class="k">„Powtórz ostatnie"</span> kopiuje cały poprzedni wynik jednym tapnięciem.</li>' +
+    '<li><span class="k">„Zakończ trening"</span> zapisuje sesję z datą.</li>' +
+    '</ol>' +
+    '<p class="mut small">Wszystko zapisuje się na bieżąco (autozapis szkicu) — po zablokowaniu ekranu nic nie ginie. Szare „Ostatnio: …" pod nazwą ćwiczenia to Twój poprzedni wynik.</p></div>';
+
+  html += '<div class="card"><h3>📈 Pomiary i historia</h3>' +
+    '<p>W <span class="k">Pomiarach</span> zapisujesz wagę, pas i obwody — pod spodem rosną wykresy i zmiana tydzień do tygodnia.</p>' +
+    '<p>W <span class="k">Historii</span> wybierasz ćwiczenie i widzisz wszystkie sesje oraz wykres progresu ciężaru w czasie.</p></div>';
+
+  html += '<div class="card"><h3>💾 Kopia zapasowa (ważne!)</h3>' +
+    '<p>Dane trzymane są <span class="k">tylko w tym telefonie</span> (w pamięci przeglądarki). Nie ma konta ani chmury.</p>' +
+    '<ul>' +
+    '<li>Co jakiś czas rób <span class="k">Eksport kopii (JSON)</span> w zakładce „Więcej" — to pełny backup do przywrócenia.</li>' +
+    '<li><span class="k">Eksport CSV</span> otworzysz w Excelu (średniki, polskie znaki).</li>' +
+    '</ul>' +
+    '<p class="mut small">Wyczyszczenie danych przeglądarki albo odinstalowanie aplikacji usuwa historię — dlatego warto mieć świeży plik JSON.</p></div>';
+
+  html += '</div>';
+  view.innerHTML = html;
+}
+
 /* ---------- Ustawienia / dane ---------- */
 function renderSettings() {
   resetView();
@@ -928,6 +991,7 @@ function router() {
     case 'run': renderRun(); break;
     case 'measure': renderMeasure(); break;
     case 'history': renderHistory(parts[1]); break;
+    case 'guide': renderGuide(); break;
     case 'settings': renderSettings(); break;
     default: renderHome();
   }

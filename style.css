@@ -285,6 +285,30 @@ label.field > span { display: block; font-size: 14px; color: var(--mut); margin-
 .switch input:checked + .knob::after { transform: translateX(21px); background: var(--a); }
 .switch input:focus-visible + .knob { outline: 2px solid var(--a); outline-offset: 2px; }
 
+/* ===== Instrukcja ===== */
+.guide .card { padding: 14px 16px; }
+.guide h3 { font-size: 16px; margin: 2px 0 8px; display: flex; align-items: center; gap: 8px; }
+.guide h3 .tag {
+  flex: none; font-size: 12px; font-weight: 700; color: var(--bg);
+  border-radius: 6px; padding: 2px 8px;
+}
+.guide h3 .tag.pa { background: var(--a); }
+.guide h3 .tag.pb { background: var(--b); }
+.guide h3 .tag.pc { background: var(--c); }
+.guide p { font-size: 15px; margin: 6px 0; }
+.guide ul { margin: 6px 0; padding-left: 20px; }
+.guide ol { margin: 6px 0; padding-left: 22px; }
+.guide li { font-size: 15px; margin: 5px 0; }
+.guide .k { font-weight: 700; color: var(--text); }
+.guide .hl { color: #86efac; font-weight: 700; }
+.guide .hl.legs { color: #fdba74; }
+.guide .day {
+  display: inline-block; font-size: 12px; color: var(--mut);
+  border: 1px solid var(--line2); border-radius: 999px; padding: 1px 8px; margin-left: 6px;
+  vertical-align: middle;
+}
+.guide .lead { color: var(--mut); font-size: 15px; margin: 2px 2px 12px; }
+
 /* ===== Timer / toast ===== */
 .timerbar {
   position: fixed;
@@ -324,7 +348,7 @@ label.field > span { display: block; font-size: 14px; color: var(--mut); margin-
   position: fixed;
   left: 0; right: 0; bottom: 0;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   background: #0d1420f2;
   border-top: 1px solid var(--line2);
   padding-bottom: env(safe-area-inset-bottom);
@@ -335,13 +359,14 @@ label.field > span { display: block; font-size: 14px; color: var(--mut); margin-
   display: grid;
   justify-items: center;
   gap: 2px;
-  padding: 8px 2px 6px;
+  padding: 8px 1px 6px;
   min-height: 56px;
   text-decoration: none;
   color: var(--mut);
-  font-size: 11px;
+  font-size: 10px;
 }
-.bottomnav a svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bottomnav a span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bottomnav a svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .bottomnav a.on { color: var(--text); }
 .bottomnav a.on svg { stroke: var(--a); }
 
