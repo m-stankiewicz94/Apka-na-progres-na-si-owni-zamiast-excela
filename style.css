@@ -295,6 +295,14 @@ label.field > span { display: block; font-size: 14px; color: var(--mut); margin-
 .guide h3 .tag.pa { background: var(--a); }
 .guide h3 .tag.pb { background: var(--b); }
 .guide h3 .tag.pc { background: var(--c); }
+.guide h3 .tag.pw { background: #2dd4bf; min-width: 22px; text-align: center; }
+.guide .disclaimer {
+  background: #ef44441a; border: 1px solid #ef444455; color: #fca5a5;
+  border-radius: 14px; padding: 12px 14px; margin: 0 0 12px; font-size: 14px; line-height: 1.5;
+}
+.guide .disclaimer strong { color: #fecaca; }
+.guide .src { font-size: 12px; color: var(--mut); word-break: break-word; margin: 4px 0; }
+.guide .src li { font-size: 12px; }
 .guide p { font-size: 15px; margin: 6px 0; }
 .guide ul { margin: 6px 0; padding-left: 20px; }
 .guide ol { margin: 6px 0; padding-left: 22px; }
@@ -348,7 +356,7 @@ label.field > span { display: block; font-size: 14px; color: var(--mut); margin-
   position: fixed;
   left: 0; right: 0; bottom: 0;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   background: #0d1420f2;
   border-top: 1px solid var(--line2);
   padding-bottom: env(safe-area-inset-bottom);
@@ -359,14 +367,15 @@ label.field > span { display: block; font-size: 14px; color: var(--mut); margin-
   display: grid;
   justify-items: center;
   gap: 2px;
-  padding: 8px 1px 6px;
+  padding: 8px 0 6px;
   min-height: 56px;
   text-decoration: none;
   color: var(--mut);
-  font-size: 10px;
+  font-size: 9px;
+  min-width: 0;
 }
 .bottomnav a span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bottomnav a svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bottomnav a svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .bottomnav a.on { color: var(--text); }
 .bottomnav a.on svg { stroke: var(--a); }
 

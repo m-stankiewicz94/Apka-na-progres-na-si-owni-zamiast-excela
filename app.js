@@ -770,6 +770,73 @@ function accentFor(exId) {
   return p === 'A' ? '#3b82f6' : p === 'B' ? '#22c55e' : '#f97316';
 }
 
+/* ---------- Rozgrzewka ---------- */
+function renderWarmup() {
+  resetView();
+  let html = '<div class="guide">';
+  html += '<h2>Rozgrzewka</h2>';
+  html += '<p class="lead">Rozgrzewka wg schematu RAMP, spersonalizowana pod <span class="k">zablokowany staw krzyżowo-biodrowy (SI)</span> i podrażniony <span class="k">nerw kulszowy</span>. Wykonuj przed każdym treningiem — całość ok. 10–15 min.</p>';
+
+  html += '<div class="disclaimer">⚠️ <strong>To nie jest porada medyczna.</strong> Masz zdiagnozowany uraz — najlepiej skonsultuj ten zestaw z <strong>fizjoterapeutą</strong>. Zasada nadrzędna: ćwicz <strong>bez bólu</strong>. Ostry lub promieniujący ból, drętwienie albo mrowienie w nodze = od razu przerwij dane ćwiczenie. Mobilizacja nerwu ma być delikatnym „ślizgiem", nigdy mocnym rozciąganiem.</div>';
+
+  html += '<div class="card"><h3><span class="tag pw">1</span> Rozgrzej (Raise) — 5 min</h3>' +
+    '<p>Podnieś tętno i temperaturę ciała spokojnym, <span class="k">mało uderzeniowym</span> cardio — łagodniejszym dla stawu SI i kulszowego niż bieżnia:</p>' +
+    '<ul><li>rower stacjonarny, orbitrek lub szybki marsz — <span class="k">5 min</span>, tempo konwersacyjne</li></ul></div>';
+
+  html += '<div class="card"><h3><span class="tag pw">2</span> Aktywuj (Activate) — pośladki i głęboki core</h3>' +
+    '<p class="mut small">Kluczowe przy dysfunkcji SI: silne pośladki i głęboki core stabilizują miednicę i odciążają staw oraz mięsień gruszkowaty.</p>' +
+    '<ul>' +
+    '<li><span class="k">Mostek biodrowy</span> — 2 × 10–12, mocno ściśnij pośladki na górze</li>' +
+    '<li><span class="k">Muszelka (clamshell)</span> — 2 × 12 / strona, kolana zgięte, miednica nieruchoma (mięsień pośladkowy średni)</li>' +
+    '<li><span class="k">Bird-dog</span> (naprzemienny wyprost ręka + przeciwna noga w klęku) — 2 × 8 / strona, przytrzymaj 3–5 s; nie pozwól obracać się miednicy</li>' +
+    '<li><span class="k">Dead bug (martwy robak)</span> — 2 × 8 / strona, lędźwie dociśnięte do podłogi</li>' +
+    '<li><span class="k">Napięcie poprzecznego brzucha</span> — delikatnie „wciągnij" brzuch, 5 × 5 s</li>' +
+    '</ul></div>';
+
+  html += '<div class="card"><h3><span class="tag pw">3</span> Mobilizuj (Mobilise) — biodra i lędźwie</h3>' +
+    '<ul>' +
+    '<li><span class="k">Kot–krowa</span> — 8–10 powtórzeń, płynnie</li>' +
+    '<li><span class="k">Rotacje bioder 90/90</span> (siad, przekładanie kolan) — 8 / strona</li>' +
+    '<li><span class="k">Kolano do klatki</span> pojedynczo — 5 / strona, delikatnie</li>' +
+    '<li><span class="k">Rozciąganie mięśnia gruszkowatego</span> (wersja modyfikowana: kostka na przeciwnym kolanie, przyciągnij udo do klatki) — 2 × 20–30 s / strona, <span class="hl legs">tylko do lekkiego napięcia, nie do bólu</span>. Gruszkowaty często uciska nerw kulszowy.</li>' +
+    '</ul></div>';
+
+  html += '<div class="card"><h3><span class="tag pw">4</span> Mobilizacja nerwu kulszowego (nerve flossing)</h3>' +
+    '<p>Delikatny „ślizg" nerwu — <span class="k">ruchy przeciwstawne</span>, bez ciągnięcia bólu:</p>' +
+    '<ul>' +
+    '<li><span class="k">Siedząc na krześle:</span> wyprostuj kolano i <span class="k">zegnij stopę do siebie</span>, jednocześnie odchylając głowę w tył → wróć i zegnij kolano, wyciągając palce stopy i pochylając głowę w przód. 10 płynnych powtórzeń / strona.</li>' +
+    '<li><span class="k">Alternatywa leżąc:</span> przyciągnij kolano do klatki, potem prostuj kolano ze stopą zgiętą do siebie i wracaj. 10 / strona.</li>' +
+    '</ul>' +
+    '<p class="mut small">To ma być ślizg, nie rozciąganie. Jeśli nasila drętwienie lub ból promieniujący w nogę — zmniejsz zakres albo odpuść.</p></div>';
+
+  html += '<div class="card"><h3><span class="tag pw">5</span> Przygotuj (Potentiate) — serie rozgrzewkowe</h3>' +
+    '<ul>' +
+    '<li>Przed pierwszym ćwiczeniem zrób <span class="k">1–2 serie rozgrzewkowe</span> z lekkim ciężarem (ok. 40–60% roboczego), stopniowo dochodząc do ciężaru z planu.</li>' +
+    '<li>Utrzymuj <span class="k">neutralny kręgosłup i napięty core</span> — to najważniejsza ochrona stawu SI.</li>' +
+    '</ul></div>';
+
+  html += '<div class="card"><h3>🧭 Wskazówki pod Twój uraz (SI + kulszowy)</h3>' +
+    '<ul>' +
+    '<li>Przy przysiadach, wyciskaniu nogami i martwym trzymaj <span class="k">neutralną miednicę i napięty brzuch</span> — nie „zwijaj" lędźwi na dole.</li>' +
+    '<li>Uważaj na <span class="k">asymetryczne i rotacyjne</span> obciążenia (przysiad bułgarski, wiosłowanie jednorącz) — kontroluj miednicę, w gorsze dni zmniejsz zakres lub ciężar.</li>' +
+    '<li><span class="k">Unikaj</span> ruchów nasilających promieniujący ból lub drętwienie nogi. Nic nie rób „na siłę".</li>' +
+    '<li>Ćwiczenia aktywujące pośladki (mostek, muszelka) warto robić <span class="k">codziennie</span> — odciążają staw SI i gruszkowaty.</li>' +
+    '<li>W gorszy dzień skróć rozgrzewkę do: Raise + Activate + nerve flossing.</li>' +
+    '</ul></div>';
+
+  html += '<div class="card"><h3>📚 Źródła</h3><p class="src">Zestaw oparty na ogólnodostępnych, rzetelnych materiałach:</p>' +
+    '<ul class="src">' +
+    '<li>Protokół RAMP (Raise–Activate–Mobilise–Potentiate) — Third Space, O\'Hanlon Performance</li>' +
+    '<li>Ćwiczenia na dysfunkcję stawu SI (mostek, muszelka, bird-dog, stabilizacja core) — Hinge Health, Frontiers in Physiology (2024)</li>' +
+    '<li>Nerve flossing / ślizgi nerwu kulszowego — GoodRx, HealthCentral</li>' +
+    '<li>Rozciąganie mięśnia gruszkowatego przy rwie kulszowej — Spine-health, JAG PT</li>' +
+    '</ul>' +
+    '<p class="src mut">To materiały edukacyjne, nie zastępują diagnozy ani planu od Twojego fizjoterapeuty.</p></div>';
+
+  html += '</div>';
+  view.innerHTML = html;
+}
+
 /* ---------- Instrukcja ---------- */
 function renderGuide() {
   resetView();
@@ -991,6 +1058,7 @@ function router() {
     case 'run': renderRun(); break;
     case 'measure': renderMeasure(); break;
     case 'history': renderHistory(parts[1]); break;
+    case 'warmup': renderWarmup(); break;
     case 'guide': renderGuide(); break;
     case 'settings': renderSettings(); break;
     default: renderHome();
