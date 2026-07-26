@@ -188,6 +188,17 @@ label.field > span { display: block; font-size: 14px; color: var(--mut); margin-
 }
 .wrow .unit { color: var(--mut); font-size: 15px; flex: none; }
 
+.restctl { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+.restctl .restlbl { color: var(--mut); font-size: 13px; margin-right: auto; }
+.restctl .restminus, .restctl .restplus {
+  flex: none; min-height: 40px; min-width: 46px; padding: 0;
+  font-size: 22px; font-weight: 700; line-height: 1;
+}
+.restctl .restval {
+  flex: none; min-width: 56px; text-align: center;
+  font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+
 .copyrow { margin: 0 0 10px; }
 .copylast { width: 100%; min-height: 44px; font-size: 15px; color: var(--neut); background: var(--card2); }
 

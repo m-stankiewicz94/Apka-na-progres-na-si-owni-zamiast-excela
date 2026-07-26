@@ -86,10 +86,19 @@ function cleanMeasures(arr) {
   return arr.filter(function (m) { return m && typeof m === 'object' && typeof m.date === 'string'; });
 }
 
+function normSettings(s) {
+  s = (s && typeof s === 'object') ? s : {};
+  if (typeof s.timer !== 'boolean') s.timer = true;
+  if (typeof s.vibrate !== 'boolean') s.vibrate = true;
+  if (s.cycleStart === undefined) s.cycleStart = null;
+  if (!s.rest || typeof s.rest !== 'object') s.rest = {};   // { exId: sekundy }
+  return s;
+}
+
 let sessions = cleanSessions(loadKey('sessions', []));
 let runs = cleanRuns(loadKey('runs', []));
 let measures = cleanMeasures(loadKey('measures', []));
-let settings = Object.assign({ timer: true, cycleStart: null }, loadKey('settings', {}) || {});
+let settings = normSettings(loadKey('settings', {}));
 
 function persist() {
   saveKey('sessions', sessions);
@@ -166,6 +175,17 @@ function cycleWeek() {
 }
 function isDeload() { return cycleWeek() === 8; }
 function roundToPlate(w) { return Math.round(w / 2.5) * 2.5; }
+
+/* Czas przerwy dla ćwiczenia: własny (jeśli ustawiony) lub domyślny z planu. */
+const REST_MAX = 600, REST_STEP = 15;
+function restForEx(ex) {
+  const r = settings.rest[ex.id];
+  return (typeof r === 'number' && r >= 0) ? r : ex.restSec;
+}
+function fmtRest(sec) {
+  if (!sec || sec <= 0) return 'wył.';
+  return Math.floor(sec / 60) + ':' + pad2(sec % 60);
+}
 
 /* =========================================================
    Ostatnie wyniki i progresja
@@ -251,7 +271,9 @@ function tickTimer() {
       timerOver = true;
       bar.classList.add('over');
       document.getElementById('timerlabel').textContent = 'Przerwa skończona — jedziemy!';
-      try { if (navigator.vibrate) navigator.vibrate([200, 100, 200]); } catch (e) {}
+      if (settings.vibrate) {
+        try { if (navigator.vibrate) navigator.vibrate([500, 150, 500, 150, 500]); } catch (e) {}
+      }
       beep();
       setTimeout(stopRestTimer, 6000);
     }
@@ -413,8 +435,14 @@ function renderWorkout(planKey) {
 
     html += '<article class="excard ' + p.cls + '" data-ex="' + ex.id + '">';
     html += '<div class="exhead"><span class="exnum">' + (idx + 1) + '</span><h3>' + esc(ex.name) + '</h3></div>';
-    html += '<p class="extarget">' + ex.sets + ' × ' + esc(ex.repsLabel) + ' powt. · przerwa ' + esc(ex.rest) + '</p>';
+    html += '<p class="extarget">' + ex.sets + ' × ' + esc(ex.repsLabel) + ' powt. · zalecana przerwa ' + esc(ex.rest) + '</p>';
     html += '<p class="exlast">' + esc(fmtLast(lr)) + '</p>';
+    html += '<div class="restctl">' +
+      '<span class="restlbl">⏱ Timer przerwy</span>' +
+      '<button type="button" class="restminus" aria-label="Skróć przerwę o 15 sekund">−</button>' +
+      '<span class="restval">' + fmtRest(restForEx(ex)) + '</span>' +
+      '<button type="button" class="restplus" aria-label="Wydłuż przerwę o 15 sekund">+</button>' +
+      '</div>';
     if (prog) {
       html += '<span class="badge">Progresja: +' + fmtNum(prog.inc) + ' kg → ' + fmtNum(prog.to) + ' kg</span>';
     }
@@ -474,7 +502,8 @@ function workoutChange(e) {
         break;
       }
     }
-    startRestTimer(ex.restSec, esc10(ex.name));
+    const rest = restForEx(ex);
+    if (rest > 0) startRestTimer(rest, esc10(ex.name));
   }
   saveDraftFromDOM(currentPlan);
 }
@@ -496,6 +525,18 @@ function workoutClick(e) {
     if (w < 0) w = 0;
     input.value = fmtNum(w);
     saveDraftFromDOM(currentPlan);
+    return;
+  }
+  const restBtn = e.target.closest('.restminus, .restplus');
+  if (restBtn) {
+    const card = restBtn.closest('.excard');
+    const ex = EX_BY_ID[card.dataset.ex];
+    let cur = restForEx(ex) + (restBtn.classList.contains('restplus') ? REST_STEP : -REST_STEP);
+    if (cur < 0) cur = 0;
+    if (cur > REST_MAX) cur = REST_MAX;
+    settings.rest[ex.id] = cur;
+    saveKey('settings', settings);
+    card.querySelector('.restval').textContent = fmtRest(cur);
     return;
   }
   const copyBtn = e.target.closest('.copylast');
@@ -908,6 +949,9 @@ function renderSettings() {
   let html = '<h2>Ustawienia</h2><div class="card">' +
     '<div class="setrow"><div>Timer przerwy po odhaczeniu serii</div>' +
     '<span class="switch"><input type="checkbox" id="stimer"' + (settings.timer ? ' checked' : '') + '><span class="knob"></span></span></div>' +
+    '<div class="setrow"><div>Wibracja po zakończeniu przerwy</div>' +
+    '<span class="switch"><input type="checkbox" id="svibrate"' + (settings.vibrate ? ' checked' : '') + '><span class="knob"></span></span></div>' +
+    '<p class="mut small" style="margin:8px 2px 0">Czas przerwy ustawiasz osobno dla każdego ćwiczenia na ekranie treningu (± 15 s, „wył." blokuje timer). Wibracja działa na Androidzie — iPhone (Safari) nie obsługuje wibracji ze strony.</p>' +
     '</div>';
 
   html += '<h2>Cykl</h2><div class="card">' +
@@ -930,6 +974,11 @@ function renderSettings() {
   document.getElementById('stimer').addEventListener('change', function () {
     settings.timer = this.checked;
     saveKey('settings', settings);
+  });
+  document.getElementById('svibrate').addEventListener('change', function () {
+    settings.vibrate = this.checked;
+    saveKey('settings', settings);
+    if (this.checked) { try { if (navigator.vibrate) navigator.vibrate(120); } catch (e) {} }
   });
   view.addEventListener('click', function (e) {
     switch (e.target.id) {
@@ -990,7 +1039,7 @@ function importJSON(file) {
       if (!ns.length && !nr.length && !nm.length) throw new Error('empty');
       if (!confirm('Wczytać kopię? Zastąpi obecne dane (treningi: ' + ns.length + ', biegi: ' + nr.length + ', pomiary: ' + nm.length + ').')) return;
       sessions = ns; runs = nr; measures = nm;
-      if (d.settings && typeof d.settings === 'object') settings = Object.assign({ timer: true, cycleStart: null }, d.settings);
+      if (d.settings && typeof d.settings === 'object') settings = normSettings(d.settings);
       persist();
       updateWeekChip();
       renderSettings();
