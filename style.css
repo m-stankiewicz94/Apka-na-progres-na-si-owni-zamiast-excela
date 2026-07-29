@@ -188,6 +188,56 @@ label.field > span { display: block; font-size: 14px; color: var(--mut); margin-
 }
 .wrow .unit { color: var(--mut); font-size: 15px; flex: none; }
 
+/* ===== Notatka do ćwiczenia ===== */
+.note { margin: 2px 0 10px; }
+.note .notepreview {
+  width: 100%;
+  display: flex; align-items: center; gap: 8px;
+  text-align: left;
+  min-height: 42px;
+  padding: 8px 11px;
+  background: transparent;
+  border: 1px dashed var(--line2);
+  border-radius: 12px;
+  color: var(--mut);
+  font: inherit; font-size: 14px;
+}
+.note .notepreview .noteicon { flex: none; font-size: 15px; line-height: 1; opacity: .85; }
+.note .notepreview .txt { flex: 1; min-width: 0; }
+.note .notepreview .txt.add { color: var(--mut); }
+.note .notepreview .notehint { flex: none; font-size: 12px; color: var(--mut); }
+
+/* stan z notatką: bursztynowy akcent, podgląd do 2 linii */
+.note.has .notepreview {
+  align-items: flex-start;
+  border-style: solid;
+  border-color: #fbbf2455;
+  border-left: 3px solid var(--warn);
+  background: #fbbf2412;
+  color: var(--text);
+}
+.note.has .notepreview .txt {
+  color: var(--text);
+  white-space: pre-wrap;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* rozwinięte pole edycji */
+.note .notebox { display: none; margin-top: 6px; }
+.note.open .notepreview { display: none; }
+.note.open .notebox { display: block; }
+.note .noteedit {
+  width: 100%; min-height: 86px; resize: vertical;
+  font-size: 16px; line-height: 1.45;
+  background: var(--bg); border: 1px solid var(--a); border-radius: 12px; padding: 10px 12px;
+  color: var(--text);
+}
+.note .noterow { display: flex; justify-content: flex-end; margin-top: 6px; }
+.note .notedone {
+  min-height: 40px; padding: 6px 18px; font-size: 15px;
+  color: var(--neut); background: var(--card2); border: 1px solid var(--line2); border-radius: 12px;
+}
+
 .restctl { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
 .restctl .restlbl { color: var(--mut); font-size: 13px; margin-right: auto; }
 .restctl .restminus, .restctl .restplus {

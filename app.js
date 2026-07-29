@@ -85,6 +85,14 @@ function cleanMeasures(arr) {
   if (!Array.isArray(arr)) return [];
   return arr.filter(function (m) { return m && typeof m === 'object' && typeof m.date === 'string'; });
 }
+function cleanNotes(o) {
+  if (!o || typeof o !== 'object') return {};
+  const out = {};
+  Object.keys(o).forEach(function (k) {
+    if (typeof o[k] === 'string' && o[k].trim()) out[k] = o[k];
+  });
+  return out;
+}
 
 function normSettings(s) {
   s = (s && typeof s === 'object') ? s : {};
@@ -98,12 +106,14 @@ function normSettings(s) {
 let sessions = cleanSessions(loadKey('sessions', []));
 let runs = cleanRuns(loadKey('runs', []));
 let measures = cleanMeasures(loadKey('measures', []));
+let notes = cleanNotes(loadKey('notes', {}));   // { exId: tekst notatki }
 let settings = normSettings(loadKey('settings', {}));
 
 function persist() {
   saveKey('sessions', sessions);
   saveKey('runs', runs);
   saveKey('measures', measures);
+  saveKey('notes', notes);
   saveKey('settings', settings);
 }
 
@@ -437,6 +447,18 @@ function renderWorkout(planKey) {
     html += '<div class="exhead"><span class="exnum">' + (idx + 1) + '</span><h3>' + esc(ex.name) + '</h3></div>';
     html += '<p class="extarget">' + ex.sets + ' × ' + esc(ex.repsLabel) + ' powt. · zalecana przerwa ' + esc(ex.rest) + '</p>';
     html += '<p class="exlast">' + esc(fmtLast(lr)) + '</p>';
+    const note = notes[ex.id] || '';
+    html += '<div class="note' + (note ? ' has' : '') + '" data-ex="' + ex.id + '">' +
+      '<button type="button" class="notepreview">' +
+        '<span class="noteicon">🗒️</span>' +
+        '<span class="txt' + (note ? '' : ' add') + '">' + (note ? esc(note) : 'Dodaj notatkę…') + '</span>' +
+        '<span class="notehint">' + (note ? 'edytuj' : '') + '</span>' +
+      '</button>' +
+      '<div class="notebox">' +
+        '<textarea class="noteedit" rows="3" placeholder="Np. ustawienia maszyny, technika, jak się czułeś…">' + esc(note) + '</textarea>' +
+        '<div class="noterow"><button type="button" class="notedone">Gotowe</button></div>' +
+      '</div>' +
+    '</div>';
     html += '<div class="restctl">' +
       '<span class="restlbl">⏱ Timer przerwy</span>' +
       '<button type="button" class="restminus" aria-label="Skróć przerwę o 15 sekund">−</button>' +
@@ -484,7 +506,24 @@ function renderWorkout(planKey) {
 }
 
 function workoutInput(e) {
+  if (e.target.matches('.noteedit')) { saveNoteFromEl(e.target.closest('.note')); return; }
   if (e.target.matches('input.w, input.reps')) saveDraftFromDOM(currentPlan);
+}
+
+function saveNoteFromEl(noteEl) {
+  const exId = noteEl.dataset.ex;
+  const val = noteEl.querySelector('.noteedit').value.trim();
+  if (val) notes[exId] = val; else delete notes[exId];
+  saveKey('notes', notes);
+}
+function refreshNotePreview(noteEl) {
+  const val = notes[noteEl.dataset.ex] || '';
+  const txt = noteEl.querySelector('.notepreview .txt');
+  const hint = noteEl.querySelector('.notepreview .notehint');
+  noteEl.classList.toggle('has', !!val);
+  txt.textContent = val || 'Dodaj notatkę…';
+  txt.classList.toggle('add', !val);
+  if (hint) hint.textContent = val ? 'edytuj' : '';
 }
 function workoutChange(e) {
   if (!e.target.matches('input.done')) return;
@@ -525,6 +564,22 @@ function workoutClick(e) {
     if (w < 0) w = 0;
     input.value = fmtNum(w);
     saveDraftFromDOM(currentPlan);
+    return;
+  }
+  const notePrev = e.target.closest('.notepreview');
+  if (notePrev) {
+    const noteEl = notePrev.closest('.note');
+    noteEl.classList.add('open');
+    const ta = noteEl.querySelector('.noteedit');
+    ta.focus();
+    const v = ta.value; ta.value = ''; ta.value = v;   // kursor na końcu
+    return;
+  }
+  if (e.target.closest('.notedone')) {
+    const noteEl = e.target.closest('.note');
+    saveNoteFromEl(noteEl);
+    refreshNotePreview(noteEl);
+    noteEl.classList.remove('open');
     return;
   }
   const restBtn = e.target.closest('.restminus, .restplus');
@@ -1025,7 +1080,7 @@ function download(name, text, mime) {
 function stamp() { return todayISO().replace(/-/g, ''); }
 
 function exportJSON() {
-  const data = { app: 'gym-tracker', version: DB_V, exportedAt: new Date().toISOString(), sessions: sessions, runs: runs, measures: measures, settings: settings };
+  const data = { app: 'gym-tracker', version: DB_V, exportedAt: new Date().toISOString(), sessions: sessions, runs: runs, measures: measures, notes: notes, settings: settings };
   download('trening-kopia-' + stamp() + '.json', JSON.stringify(data, null, 2), 'application/json');
   toast('Kopia zapisana do pliku');
 }
@@ -1039,6 +1094,7 @@ function importJSON(file) {
       if (!ns.length && !nr.length && !nm.length) throw new Error('empty');
       if (!confirm('Wczytać kopię? Zastąpi obecne dane (treningi: ' + ns.length + ', biegi: ' + nr.length + ', pomiary: ' + nm.length + ').')) return;
       sessions = ns; runs = nr; measures = nm;
+      notes = cleanNotes(d.notes);
       if (d.settings && typeof d.settings === 'object') settings = normSettings(d.settings);
       persist();
       updateWeekChip();
