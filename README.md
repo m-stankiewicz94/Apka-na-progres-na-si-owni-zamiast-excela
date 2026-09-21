@@ -24,6 +24,20 @@ bez frameworków — czysty HTML + CSS + JS.
   kulszowy (aktywacja pośladków/core, nerve flossing, mobilizacja gruszkowatego), z zastrzeżeniem
   medycznym i źródłami
 
+## Druga aplikacja: „Progres” (`beginner/`)
+
+Osobna PWA dla osoby początkującej (plan A/B całego ciała, faza wprowadzająca,
+deload, instrukcje każdego ćwiczenia z ilustracjami SVG, rozgrzewka prowadzona,
+kardio i kroki, pomiary, zdjęcia sylwetki w IndexedDB, kalkulator kalorii, wiedza).
+Jasny, ciepły motyw z przełącznikiem na ciemny, fonty Manrope + Fraunces (OFL) w repo.
+
+**Aplikacja:** https://m-stankiewicz94.github.io/Apka-na-progres-na-si-owni-zamiast-excela/beginner/
+
+Obie aplikacje są niezależne: własny `manifest.json`, własny service worker
+(`beginner/sw.js`, scope ograniczony do `beginner/`, cache `gf-*`), klucze
+`localStorage` z prefiksem `gf.` (stara apka używa `gym.`), zdjęcia w bazie
+IndexedDB `gf-photos`. Po zmianach w `beginner/` podbij `CACHE` w `beginner/sw.js`.
+
 ## Pliki
 
 | Plik | Rola |
@@ -35,6 +49,7 @@ bez frameworków — czysty HTML + CSS + JS.
 | `sw.js` | service worker — cache offline (przy zmianach podbij `CACHE` w środku) |
 | `icons/` | ikony aplikacji |
 | `.github/workflows/deploy.yml` | automatyczne wdrożenie na GitHub Pages po pushu |
+| `beginner/` | druga aplikacja „Progres” (index.html, style.css, content.js, app.js, screens.js, sw.js, manifest.json, icons/, fonts/) |
 
 ## Zmiany
 
