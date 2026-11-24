@@ -100,6 +100,7 @@ function normSettings(s) {
   if (typeof s.vibrate !== 'boolean') s.vibrate = true;
   if (s.cycleStart === undefined) s.cycleStart = null;
   if (!s.rest || typeof s.rest !== 'object') s.rest = {};   // { exId: sekundy }
+  if (typeof s.lastBackup !== 'number') s.lastBackup = null; // ms ostatniego eksportu JSON
   return s;
 }
 
@@ -1015,6 +1016,7 @@ function renderSettings() {
     '</div>';
 
   html += '<h2>Dane</h2><div class="card" style="display:grid;gap:8px">' +
+    '<p id="slastbak" class="mut small" style="margin:0 2px">' + esc(lastBackupText()) + '</p>' +
     '<button type="button" id="sexp" class="btn wide">Eksport kopii zapasowej (JSON)</button>' +
     '<button type="button" id="simp" class="btn wide">Import z kopii (JSON)</button>' +
     '<input type="file" id="sfile" accept=".json,application/json" hidden>' +
@@ -1068,8 +1070,34 @@ function renderSettings() {
   });
 }
 
+/* Zapis pliku. Na telefonie (ekran dotykowy) otwiera systemowe okno
+   „Udostępnij" — w PWA na iPhonie zwykłe pobieranie często nie działa.
+   Na komputerze albo gdy udostępnianie jest niedostępne: zwykłe pobranie.
+   Zwraca Promise: true = plik zapisany/udostępniony, false = użytkownik anulował. */
 function download(name, text, mime) {
   const blob = new Blob([text], { type: mime });
+  if (preferShare()) {
+    let file = null;
+    try { file = new File([blob], name, { type: mime.split(';')[0] }); } catch (e) {}
+    if (file && navigator.canShare({ files: [file] })) {
+      return navigator.share({ files: [file], title: name }).then(
+        function () { return true; },
+        function (err) {
+          if (err && err.name === 'AbortError') return false;   // zamknięto okno „Udostępnij"
+          saveViaLink(blob, name);
+          return true;
+        }
+      );
+    }
+  }
+  saveViaLink(blob, name);
+  return Promise.resolve(true);
+}
+function preferShare() {
+  return !!(navigator.share && navigator.canShare && window.matchMedia &&
+    window.matchMedia('(pointer: coarse)').matches);
+}
+function saveViaLink(blob, name) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = name;
@@ -1077,12 +1105,29 @@ function download(name, text, mime) {
   a.click();
   setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
 }
-function stamp() { return todayISO().replace(/-/g, ''); }
+/* Data i godzina do nazwy pliku: 20261124-1830 */
+function stamp() {
+  const d = new Date();
+  return todayISO().replace(/-/g, '') + '-' + pad2(d.getHours()) + pad2(d.getMinutes());
+}
+function fmtDateTime(ms) {
+  const d = new Date(ms);
+  return pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1) + '.' + d.getFullYear() + ', ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function lastBackupText() {
+  return settings.lastBackup ? 'Ostatnia kopia JSON: ' + fmtDateTime(settings.lastBackup) : 'Nie masz jeszcze żadnej kopii JSON.';
+}
 
 function exportJSON() {
   const data = { app: 'gym-tracker', version: DB_V, exportedAt: new Date().toISOString(), sessions: sessions, runs: runs, measures: measures, notes: notes, settings: settings };
-  download('trening-kopia-' + stamp() + '.json', JSON.stringify(data, null, 2), 'application/json');
-  toast('Kopia zapisana do pliku');
+  download('trening-kopia-' + stamp() + '.json', JSON.stringify(data, null, 2), 'application/json').then(function (ok) {
+    if (!ok) return;
+    settings.lastBackup = Date.now();
+    saveKey('settings', settings);
+    const info = document.getElementById('slastbak');
+    if (info) info.textContent = lastBackupText();
+    toast('Kopia zapisana do pliku');
+  });
 }
 function importJSON(file) {
   const reader = new FileReader();
